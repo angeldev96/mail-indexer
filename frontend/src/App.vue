@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div >
     <Search @results="updateEmails" />
     <EmailList :emails="emails" />
   </div>

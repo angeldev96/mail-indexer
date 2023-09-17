@@ -24,13 +24,14 @@ func main() {
 
 	// Configura CORS
 	corsConfig := cors.New(cors.Options{
-		AllowedOrigins:   []string{fmt.Sprintf("http://localhost:%d", *vuePortPtr)}, // Asegúrate de que esta línea esté presente y sea correcta
+		AllowedOrigins:   []string{"http://127.0.0.1:7070"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	})
+
 	r.Use(corsConfig.Handler)
 
 	// Definir rutas
@@ -46,7 +47,7 @@ func main() {
 
 func startVueServer(port int) {
 	cmd := exec.Command("npm", "run", "dev", "--", fmt.Sprintf("--port=%d", port))
-	cmd.Dir = "/home/luzbel/Dev/indexer-frontend" // Reemplaza con la ruta a tu proyecto Vue
+	cmd.Dir = "/home/luzbel/mail-indexer/frontend" // Reemplaza con la ruta a tu proyecto Vue
 	err := cmd.Start()
 	if err != nil {
 		log.Fatalf("Error iniciando el servidor Vue: %v", err)
