@@ -8,12 +8,10 @@
 
 <script>
 import Search from './components/Search.vue';
-import EmailList from './components/EmailList.vue';
 
 export default {
   components: {
     Search,
-    EmailList,
   },
   data() {
     return {

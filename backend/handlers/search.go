@@ -21,7 +21,7 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 
 	// Preparar la solicitud para ZincSearch
 	zincReq := ZincSearchRequest{
-		SearchType: "matchAll",
+		SearchType: "match", // Cambiado a "match"
 		Query: struct {
 			Term  string `json:"term"`
 			Field string `json:"field"`
