@@ -1,25 +1,27 @@
 <template>
   <div>
-    <ul v-if="emails.length">
-      <li v-for="email in emails" :key="email._id">
-        {{ email._source.content }}
-      </li>
-    </ul>
-    <p v-else>No se encontraron emails.</p>
+    <!-- Lista de correos y su contenido -->
+    <div v-for="emailContent in emailContents" :key="emailContent.id" class="mt-4 p-4 border rounded">
+      <h3 class="text-xl font-bold mb-2">Contenido del Correo:</h3>
+      <p>{{ emailContent.content }}</p>
+      <h4 class="text-lg font-bold mt-4 mb-2">Direcciones de correo electrónico:</h4>
+      <ul>
+        <li v-for="email in emailContent.emails" :key="email">{{ email }}</li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    emails: {
+    emailContents: {
       type: Array,
-      default: () => []
+      required: true
     }
   }
 };
 </script>
 
 <style scoped>
-/* Puedes agregar estilos específicos aquí si lo deseas */
 </style>
