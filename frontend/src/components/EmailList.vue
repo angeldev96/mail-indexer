@@ -1,14 +1,41 @@
 <template>
   <div>
-    <!-- Lista de correos y su contenido -->
-    <div v-for="emailContent in emailContents" :key="emailContent.id" class="mt-4 p-4 border rounded">
-      <h3 class="text-xl font-bold mb-2">Contenido del Correo:</h3>
-      <p>{{ emailContent.content }}</p>
-      <h4 class="text-lg font-bold mt-4 mb-2">Direcciones de correo electrónico:</h4>
-      <ul>
-        <li v-for="email in emailContent.emails" :key="email">{{ email }}</li>
-      </ul>
-    </div>
+    <!-- Tabla -->
+    <table class="table-auto w-full">
+      <!-- Encabezados de la tabla -->
+      <thead>
+        <tr>
+          <th class="px-4 py-2">Remitente</th>
+          <th class="px-4 py-2">Asunto</th>
+          <th class="px-4 py-2">Vista previa</th>
+          <th class="px-4 py-2">Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Lista de correos -->
+        <tr v-for="emailContent in emailContents" :key="emailContent._id">
+          <!-- Nombre de la persona o entidad que envió el correo -->
+          <td class="border px-4 py-2">
+            {{ extractField(emailContent.content, 'From') }}
+          </td>
+
+          <!-- Subject del correo -->
+          <td class="border px-4 py-2">
+            {{ extractField(emailContent.content, 'Subject') }}
+          </td>
+
+          <!-- Primeras 5 palabras del correo -->
+          <td class="border px-4 py-2">
+            {{ extractContentPreview(emailContent.content) }}
+          </td>
+
+          <!-- Fecha que se envió el correo -->
+          <td class="border px-4 py-2">
+            {{ formatDate(extractField(emailContent.content, 'Date')) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -19,9 +46,25 @@ export default {
       type: Array,
       required: true
     }
+  },
+  methods: {
+    extractField(content, field) {
+      const regex = new RegExp(`${field}: (.+)\\r\\n`);
+      const match = content.match(regex);
+      return match ? match[1].trim() : '';
+    },
+    extractContentPreview(content) {
+      const body = content.split('\r\n\r\n')[1];
+      return body ? body.split(' ').slice(0, 5).join(' ') + '...' : '';
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    }
   }
 };
 </script>
 
 <style scoped>
+/* Aquí puedes agregar estilos específicos para este componente si lo necesitas */
 </style>
