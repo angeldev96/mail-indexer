@@ -1,3 +1,5 @@
+
+
 <template>
   <div>
     <!-- Tabla -->
@@ -13,7 +15,7 @@
       </thead>
       <tbody>
         <!-- Lista de correos -->
-        <tr v-for="emailContent in emailContents" :key="emailContent._id">
+        <tr v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
           <!-- Nombre de la persona o entidad que envió el correo -->
           <td class="border px-4 py-2">
             {{ extractField(emailContent.content, 'From') }}
@@ -35,17 +37,30 @@
           </td>
         </tr>
       </tbody>
+      <EmailDetail v-if="selectedEmail" :email="selectedEmail" />
+
     </table>
   </div>
 </template>
 
 <script>
+import EmailDetail from './EmailDetail.vue';
+
 export default {
+  
+  components: {
+    EmailDetail
+  },
   props: {
     emailContents: {
       type: Array,
       required: true
     }
+  },
+  data() {
+    return {
+      selectedEmail: null
+    };
   },
   methods: {
     extractField(content, field) {
@@ -60,11 +75,16 @@ export default {
     formatDate(dateString) {
       const date = new Date(dateString);
       return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    },
+    selectEmail(email) {
+      this.selectedEmail = email;
     }
+    
   }
 };
 </script>
 
 <style scoped>
-/* Aquí puedes agregar estilos específicos para este componente si lo necesitas */
+
 </style>
+
