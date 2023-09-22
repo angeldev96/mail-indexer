@@ -3,36 +3,32 @@
 <template>
   <div>
     <!-- Tabla -->
-    <table class="table-auto w-full">
+    <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400">
       <!-- Encabezados de la tabla -->
-      <thead>
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
-          <th class="px-4 py-2">Sent by</th>
-          <th class="px-4 py-2">Subject</th>
-          <th class="px-4 py-2">Preview</th>
-          <th class="px-4 py-2">Date</th>
+          <th class="px-6 py-3">Sent by</th>
+          <th class="px-6 py-3">Subject</th>
+          <th class="px-6 py-3">Preview</th>
+          <th class="px-6 py-3">Date</th>
         </tr>
       </thead>
       <tbody>
         <!-- Lista de correos -->
-        <tr class="hover:bg-gray-100 rounded-xl cursor-pointer" v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
-          <td class="border px-4 py-2 ">
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-sky-900 rounded-xl cursor-pointer" v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
+          <td class="px-6 py-4 border font-medium text-gray-900 whitespace-nowrap dark:text-white">
             {{ extractField(emailContent.content, 'From') }}
           </td>
-
-          <td class="border px-4 py-2" v-html="highlightKeyword(extractField(emailContent.content, 'Subject'), term)">
+          <td class="px-6 py-4 border" v-html="highlightKeyword(extractField(emailContent.content, 'Subject'), term)">
           </td>
-
-          <td class="border px-4 py-2" v-html="highlightKeyword(extractContentPreview(emailContent.content), term)">
+          <td class="px-6 py-4 border" v-html="highlightKeyword(extractContentPreview(emailContent.content), term)">
           </td>
-
-          <td class="border px-4 py-2">
+          <td class="px-6 py-4 border">
             {{ formatDate(extractField(emailContent.content, 'Date')) }}
           </td>
         </tr>
       </tbody>
       <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
-
     </table>
   </div>
 </template>

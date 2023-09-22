@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <Search @updateTerm="term = $event" @searched="updateEmailContents" />
     <EmailList :term="term" :emailContents="emailContents" />
     </div>
