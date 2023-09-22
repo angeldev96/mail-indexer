@@ -15,29 +15,23 @@
       </thead>
       <tbody>
         <!-- Lista de correos -->
-        <tr v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
-          <!-- Nombre de la persona o entidad que envió el correo -->
-          <td class="border px-4 py-2">
+        <tr class="hover:bg-gray-100 rounded-xl cursor-pointer" v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
+          <td class="border px-4 py-2 ">
             {{ extractField(emailContent.content, 'From') }}
           </td>
 
-          <!-- Subject del correo -->
-          <td class="border px-4 py-2">
-            {{ extractField(emailContent.content, 'Subject') }}
+          <td class="border px-4 py-2" v-html="highlightKeyword(extractField(emailContent.content, 'Subject'), term)">
           </td>
 
-          <!-- Primeras 5 palabras del correo -->
-          <td class="border px-4 py-2">
-            {{ extractContentPreview(emailContent.content) }}
+          <td class="border px-4 py-2" v-html="highlightKeyword(extractContentPreview(emailContent.content), term)">
           </td>
 
-          <!-- Fecha que se envió el correo -->
           <td class="border px-4 py-2">
             {{ formatDate(extractField(emailContent.content, 'Date')) }}
           </td>
         </tr>
       </tbody>
-      <EmailDetail v-if="selectedEmail" :email="selectedEmail" />
+      <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
 
     </table>
   </div>
@@ -47,7 +41,7 @@
 import EmailDetail from './EmailDetail.vue';
 
 export default {
-  
+
   components: {
     EmailDetail
   },
@@ -55,7 +49,11 @@ export default {
     emailContents: {
       type: Array,
       required: true
-    }
+    },
+    term: {
+    type: String,
+    default: ''
+  }
   },
   data() {
     return {
@@ -78,13 +76,23 @@ export default {
     },
     selectEmail(email) {
       this.selectedEmail = email;
+    },
+    highlightKeyword(text, keyword) {
+      if (!keyword) return text;
+      const regex = new RegExp(`(${keyword})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
     }
-    
+
   }
 };
 </script>
 
 <style scoped>
-
+.highlight {
+  background-color: yellow;
+  padding: 2px;
+}
 </style>
+
+
 

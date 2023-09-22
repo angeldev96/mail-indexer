@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div cl>
     <!-- Campo de búsqueda y botón -->
-    <div class="flex items-center border rounded-full w-3/4 mx-auto mt-4">
-      <input v-model="term" placeholder="Search emails..." class="flex-grow py-2 px-4 outline-none rounded-l-full" @keyup.enter="search" />
+    <div class="flex items-center border rounded-full w-3/4 mx-auto mt-4 ">
+      <input v-model="term" placeholder="Search emails..." class="flex-grow py-2 px-4 outline-none rounded-l-fullb" @keyup.enter="search" />
       <button @click="search" class="px-4 text-gray-500 hover:text-blue-400 focus:outline-none bg-white rounded-r-full">
         <i class="fas fa-search"></i>
       </button>
@@ -25,7 +25,7 @@ export default {
 
     async search() {
       if (!this.term) {
-        this.$emit('searched', []);
+        this.$emit('updateTerm', this.term);
         return;
       }
 

@@ -1,11 +1,8 @@
 <template>
   <div>
-    <!-- Componente de búsqueda -->
-    <Search @searched="updateEmailContents" />
-
-    <!-- Componente para mostrar los correos -->
-    <EmailList :emailContents="emailContents" />
-  </div>
+    <Search @updateTerm="term = $event" @searched="updateEmailContents" />
+    <EmailList :term="term" :emailContents="emailContents" />
+    </div>
 </template>
 
 <script>
@@ -19,7 +16,8 @@ export default {
   },
   data() {
     return {
-      emailContents: []
+      emailContents: [],
+      term: ''
     };
   },
   methods: {

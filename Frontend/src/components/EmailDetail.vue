@@ -30,20 +30,13 @@
         const date = new Date(dateString);
         return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
       },
-      highlightKeyword(text, keyword) {
-      if (!keyword) return text;
-      const regex = new RegExp(`(${keyword})`, 'gi');
-      return text.replace(regex, '<span class="highlight">$1</span>');
-    }
+     
     }
   };
   </script>
   
   <style scoped>
 
-.highlight {
-  background-color: yellow; /* Color de fondo para resaltar */
-  padding: 2px; /* Espaciado interno para darle un poco de espacio alrededor del texto resaltado */
-}
+
 </style>
   
