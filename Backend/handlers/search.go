@@ -13,7 +13,8 @@ type ZincSearchRequest struct {
 		Term  string `json:"term"`
 		Field string `json:"field"`
 	} `json:"query"`
-	From int `json:"from"`
+	From       int `json:"from"`
+	MaxResults int `json:"max_results"`
 }
 
 func SearchEmails(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +22,7 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 
 	// Preparar la solicitud para ZincSearch
 	zincReq := ZincSearchRequest{
-		SearchType: "match", // Cambiado a "match"
+		SearchType: "match",
 		Query: struct {
 			Term  string `json:"term"`
 			Field string `json:"field"`
@@ -29,7 +30,8 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 			Term:  term,
 			Field: "_all",
 		},
-		From: 0,
+		From:       0,
+		MaxResults: 100,
 	}
 
 	jsonData, err := json.Marshal(zincReq)

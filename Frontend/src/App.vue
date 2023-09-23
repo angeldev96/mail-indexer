@@ -2,6 +2,7 @@
   <div >
     <Search @updateTerm="term = $event" @searched="updateEmailContents" />
     <EmailList :term="term" :emailContents="emailContents" />
+
     </div>
 </template>
 
@@ -12,7 +13,7 @@ import EmailList from './components/EmailList.vue'
 export default {
   components: {
     Search,
-    EmailList
+    EmailList,
   },
   data() {
     return {
