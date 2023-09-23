@@ -3,7 +3,7 @@
 <template>
   <div>
     <!-- Tabla -->
-    <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
       <!-- Encabezados de la tabla -->
       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
@@ -13,7 +13,7 @@
           <th class="px-6 py-3">Date</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody >
         <!-- Lista de correos -->
         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-sky-900 rounded-xl cursor-pointer" v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
           <td class="px-6 py-4 border font-medium text-gray-900 whitespace-nowrap dark:text-white">
