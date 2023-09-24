@@ -18,7 +18,7 @@ type ZincSearchRequest struct {
 }
 
 func SearchEmails(w http.ResponseWriter, r *http.Request) {
-	term := r.URL.Query().Get("term")
+	term := r.URL.Query().Get("term") //solo deberia de ser texto
 
 	// Preparar la solicitud para ZincSearch
 	zincReq := ZincSearchRequest{
@@ -41,7 +41,7 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Realizar la llamada a ZincSearch
-	req, err := http.NewRequest("POST", "http://localhost:4080/api/enron_emails/_search", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:4080/api/enron_emails/_search", bytes.NewBuffer(jsonData))
 	if err != nil {
 		http.Error(w, "Error creating search request", http.StatusInternalServerError)
 		return

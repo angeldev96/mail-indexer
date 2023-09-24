@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	// Define el flag para el puerto del servidor Vue
-	vuePortPtr := flag.Int("port", 8000, "Puerto en el que se ejecutará el servidor Vue")
+	// Define el flag para el puerto del servidor
+	vuePortPtr := flag.Int("port", 8000, "Puerto en el que se ejecutará el servidor ")
 	flag.Parse()
 
 	// Iniciar el servidor Vue en el puerto especificado

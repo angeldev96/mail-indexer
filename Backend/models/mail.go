@@ -6,6 +6,7 @@ type Email struct {
 	Body    string `json:"body"`
 }
 
+// FindEmailsByTerm busca correos electrónicos por término
 func FindEmailsByTerm(term string) []Email {
 	// Aquí deberías conectar con tu base de datos o lógica real para buscar correos electrónicos.
 	// Por ahora, devolvemos un resultado ficticio.

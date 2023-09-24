@@ -13,6 +13,7 @@ import (
 
 const batchSize = 1000 // Número de correos por lote
 
+// Email representa un correo electrónico en el formato de Enron
 type Email struct {
 	Content string `json:"content"`
 }
@@ -21,25 +22,29 @@ func sendBatchToZincSearch(batch []Email) error {
 	var buffer bytes.Buffer
 	for _, email := range batch {
 		buffer.WriteString(`{ "index" : { "_index" : "enron_emails" } }` + "\n")
+
 		emailJSON, err := json.Marshal(email)
 		if err != nil {
 			return err
 		}
+
 		buffer.Write(emailJSON)
 		buffer.WriteString("\n")
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:4080/api/_bulk", bytes.NewBuffer(buffer.Bytes()))
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:4080/api/_bulk", bytes.NewBuffer(buffer.Bytes()))
 	if err != nil {
 		return err
 	}
+
 	req.Header.Set("Content-Type", "application/x-ndjson")
-	req.SetBasicAuth("admin", "maiden")
+	req.SetBasicAuth("admin", "maiden") //env
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -64,12 +69,12 @@ func main() {
 
 	file, err := os.Open(tarball)
 	if err != nil {
-		panic(err)
+		panic(err) //averiguar que es panic
 	}
 	defer file.Close()
 
 	tr := tar.NewReader(file)
-	var batch []Email
+	var batch []Email //usar slice
 
 	for {
 		header, err := tr.Next()
