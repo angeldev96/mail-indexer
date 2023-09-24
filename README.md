@@ -69,7 +69,7 @@ Usa la información de perfilado obtenida en la Parte 2 para optimizar tu códig
 
 ## Contacto
 
-Para cualquier pregunta o comentario, puedes ponerte en contacto con el equipo de desarrollo a través de [correo electrónico](mailto:arivalladares2.0@gmail.com).
+Para cualquier pregunta o comentario, puedes ponerte en contacto conmigo: [correo electrónico](mailto:arivalladares2.0@gmail.com).
 
 
 
