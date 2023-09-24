@@ -65,7 +65,7 @@ Use the profiling information obtained in Part 2 to optimize your code.
 
 
 ## Contact
-For any questions or comments, you can get in touch with me through: [my email](mailto:arivalladares2.0@gmail.com).
+For any questions or comments, you can get in touch with me through [my email](mailto:arivalladares2.0@gmail.com).
 
 
 
