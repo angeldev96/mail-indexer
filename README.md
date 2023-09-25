@@ -1,75 +1,77 @@
 # Email Database Indexer App
 
-Este proyecto consiste en una aplicación web que indexa una base de datos de correos electrónicos y permite buscar información en ella. Está dividido en varias partes, cada una con su objetivo específico.
+This project consists of a web application that indexes an email database and allows searching for information within it. It is divided into several parts, each with its specific objective.
 
-## Definición del Problema
+## Problem Definition
 
-El objetivo principal de esta aplicación es crear una interfaz para buscar información en bases de datos de correos electrónicos. El proyecto se divide en las siguientes partes:
+The main goal of this application is to create an interface for searching information in email databases. The project is divided into the following parts:
 
-### Parte 1: Indexar Base de Datos de Correo Electrónico
+### Part 1: Email Database Indexing
 
-En esta etapa, descargamos la base de datos de correos de Enron Corp y luego creamos un programa que indexa sus contenidos utilizando la herramienta ZincSearch.
+In this stage, we download the Enron Corp email database and then create a program that indexes its contents using the ZincSearch tool.
 
-### Parte 2: Profiling
+### Part 2: Profiling
 
-Realizamos el perfilado de nuestro indexer utilizando las herramientas proporcionadas por Go. Luego, generamos un gráfico para visualizar el rendimiento de la aplicación.
+We profile our indexer using the tools provided by Go. Then, we generate a chart to visualize the application's performance.
 
-### Parte 3: Visualizador
+### Part 3: Visualizer
 
-Creacion de interfaz simple que permite a los usuarios buscar y consultar los contenidos de la base de datos de correos electrónicos.
+Create a simple interface that allows users to search and query the contents of the email database.
 
-### Opcional Parte 4: Optimización
+### Optional Part 4: Optimization
 
-Utilizamos la información obtenida del perfilado en la Parte 2 para optimizar el código.
+We use the information obtained from the profiling in Part 2 to optimize the code.
 
-## Tecnologías Utilizadas
+## Technologies Used
 
-- Lenguaje Backend: Go
-- Base de Datos: ZincSearch
+- Backend Language: Go
+- Database: ZincSearch
 - API Router: chi
-- Interfaz: Vue 3
+- Interface: Vue 3
 - CSS: Tailwind
 
-**Nota:** No se usaron otras librerías externas en el backend.
+**Note:** No other external libraries were used in the backend.
 
-## Cómo Ejecutar la Aplicación
+## How to Run the Application
 
-A continuación, se proporcionan instrucciones para ejecutar cada una de las partes de la aplicación.
+Below are instructions to execute each part of the application.
 
-### Parte 1: Indexar Base de Datos de Correo Electrónico
+### Part 1: Email Database Indexing
 
-Para indexar la base de datos de correos de Enron Corp, sigue estos pasos:
+To index the Enron Corp email database, follow these steps:
 
-1. Descarga la base de datos de correos desde [http://www.cs.cmu.edu/~enron/enron_mail_20110402.tgz](http://www.cs.cmu.edu/~enron/enron_mail_20110402.tgz) (423MB).
+1. Download the email database from [http://www.cs.cmu.edu/~enron/enron_mail_20110402.tgz](http://www.cs.cmu.edu/~enron/enron_mail_20110402.tgz) (423MB).
 
-2. Ejecuta el siguiente comando:
+2. Run the following command:
 
 ```bash
 $ ./indexer enron_mail_20110402
 ```
 
 
-### Parte 2: Profiling
+### Part 2: Profiling
+To profile the application, follow the instructions at https://go.dev/doc/diagnostics.
 
-Para realizar el perfilado de la aplicación, sigue las instrucciones en [https://go.dev/doc/diagnostics](https://go.dev/doc/diagnostics).
-
-### Parte 3: Visualizador
-
-Para ejecutar la interfaz de búsqueda, utiliza el siguiente comando:
+### Part 3: Visualizer
+To run the search interface, use the following command:
 ```bash
-$ ./mail-indexer -port tu_puerto
+$ ./mail-indexer -port your_port
 ```
 
-La aplicación de búsqueda estará disponible en [http://localhost:tu_puerto](http://localhost:tu_puerto).
+The search application will be available at [http://localhost:tu_puerto](http://localhost:your_port).
 
-### Opcional Parte 4: Optimización
+### Optional Part 4: Optimization
+Use the profiling information obtained in Part 2 to optimize your code.
 
-Usa la información de perfilado obtenida en la Parte 2 para optimizar tu código.
 
-
+<<<<<<< HEAD
 ## Contacto
 
 Para cualquier pregunta o comentario, puedes ponerte en contacto conmigo: [correo electrónico](mailto:arivalladares2.0@gmail.com).
+=======
+## Contact
+For any questions or comments, you can get in touch with me through: [my email](mailto:arivalladares2.0@gmail.com).
+>>>>>>> 987c1bf (Updated readme, translated to english)
 
 
 
