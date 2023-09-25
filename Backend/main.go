@@ -13,16 +13,16 @@ import (
 )
 
 func main() {
-	// Define el flag para el puerto del servidor
-	vuePortPtr := flag.Int("port", 8000, "Puerto en el que se ejecutará el servidor ")
+	// Define the flag for the server port
+	portPtr := flag.Int("port", 8000, "Port on which the server will run")
 	flag.Parse()
 
-	// Iniciar el servidor Vue en el puerto especificado
-	go startVueServer(*vuePortPtr)
+	// Start the frontend server on the specified port
+	go startFrontendServer(*portPtr)
 
 	r := chi.NewRouter()
 
-	// Configura CORS
+	// Configure CORS
 	corsConfig := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://127.0.0.1:*", "http://localhost:*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -34,23 +34,23 @@ func main() {
 
 	r.Use(corsConfig.Handler)
 
-	// Definir rutas
+	// Define routes
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/search", handlers.SearchEmails)
 	})
 
-	// Puerto predeterminado para el servidor Go
+	// Default port for the Go server
 	goPort := 8080
-	log.Printf("Iniciando el servidor Go en el puerto %d...", goPort)
+	log.Printf("Starting the Go server on port %d...", goPort)
 	http.ListenAndServe(fmt.Sprintf(":%d", goPort), r)
 }
 
-func startVueServer(port int) {
+func startFrontendServer(port int) {
 	cmd := exec.Command("npm", "run", "dev", "--", fmt.Sprintf("--port=%d", port))
-	cmd.Dir = "/home/luzbel/mail-indexer/Frontend" // Reemplaza con la ruta a tu proyecto Vue
+	cmd.Dir = "/home/luzbel/mail-indexer/Frontend" // Replace with the path to your Vue project
 	err := cmd.Start()
 	if err != nil {
-		log.Fatalf("Error iniciando el servidor Vue: %v", err)
+		log.Fatalf("Error starting the frontend server: %v", err)
 	}
-	log.Printf("Servidor Vue iniciado en el puerto %d...", port)
+	log.Printf("Frontend server started on port %d...", port)
 }
