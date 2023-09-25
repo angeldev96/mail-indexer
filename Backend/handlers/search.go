@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type ZincSearchRequest struct {
@@ -18,9 +21,16 @@ type ZincSearchRequest struct {
 }
 
 func SearchEmails(w http.ResponseWriter, r *http.Request) {
-	term := r.URL.Query().Get("term") //solo deberia de ser texto
+	// Load environment variables from .env file
+	err := godotenv.Load("../.env") // Adjust the path based on the relative location of your .env file
+	if err != nil {
+		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
+		return
+	}
 
-	// Preparar la solicitud para ZincSearch
+	term := r.URL.Query().Get("term")
+
+	// Prepare the request for ZincSearch
 	zincReq := ZincSearchRequest{
 		SearchType: "match",
 		Query: struct {
@@ -40,14 +50,19 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Realizar la llamada a ZincSearch
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:4080/api/enron_emails/_search", bytes.NewBuffer(jsonData))
+	// Fetch environment variables
+	zincSearchURL := os.Getenv("ZINC_SEARCH_URL")
+	zincSearchUser := os.Getenv("ZINC_SEARCH_USER")
+	zincSearchPassword := os.Getenv("ZINC_SEARCH_PASSWORD")
+
+	// Perform the call to ZincSearch
+	req, err := http.NewRequest(http.MethodPost, zincSearchURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		http.Error(w, "Error creating search request", http.StatusInternalServerError)
 		return
 	}
 
-	req.SetBasicAuth("admin", "maiden")
+	req.SetBasicAuth(zincSearchUser, zincSearchPassword)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -58,7 +73,7 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Leer y devolver la respuesta de ZincSearch
+	// Read and return the response from ZincSearch
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, "Error reading search response", http.StatusInternalServerError)
