@@ -31,7 +31,7 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 			Field: "_all",
 		},
 		From:       0,
-		MaxResults: 100,
+		MaxResults: 10,
 	}
 
 	jsonData, err := json.Marshal(zincReq)
