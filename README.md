@@ -64,14 +64,8 @@ The search application will be available at [http://localhost:tu_puerto](http://
 Use the profiling information obtained in Part 2 to optimize your code.
 
 
-<<<<<<< HEAD
-## Contacto
-
-Para cualquier pregunta o comentario, puedes ponerte en contacto conmigo: [correo electrónico](mailto:arivalladares2.0@gmail.com).
-=======
 ## Contact
 For any questions or comments, you can get in touch with me through: [my email](mailto:arivalladares2.0@gmail.com).
->>>>>>> 987c1bf (Updated readme, translated to english)
 
 
 
