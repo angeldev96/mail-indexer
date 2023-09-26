@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -70,7 +71,10 @@ func main() {
 	zincSearchPassword := os.Getenv("ZINC_SEARCH_PASSWORD")
 
 	go func() {
-		http.ListenAndServe(":6060", nil)
+		err := http.ListenAndServe(":6060", nil)
+		if err != nil {
+			log.Printf("Error starting profiling server: %v", err)
+		}
 	}()
 
 	if len(os.Args) < 2 {
