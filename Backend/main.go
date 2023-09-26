@@ -59,7 +59,11 @@ func main() {
 	})
 
 	log.Printf("Starting the Go server on port %s...", goPort)
-	http.ListenAndServe(fmt.Sprintf(":%s", goPort), r)
+	listenErr := http.ListenAndServe(fmt.Sprintf(":%s", goPort), r)
+	if listenErr != nil {
+		log.Fatalf("Could not start the HTTP server: %v", listenErr)
+	}
+
 }
 
 func startFrontendServer(port int, frontendDir string) {
