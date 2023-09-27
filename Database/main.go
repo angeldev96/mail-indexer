@@ -16,43 +16,43 @@ import (
 
 const defaultBatchSize = 1000 // Default number of emails per batch
 
-// Email represents an email in the Enron format
 type Email struct {
 	Content string `json:"content"`
 }
 
+type BulkV2Payload struct {
+	Index   string  `json:"index"`
+	Records []Email `json:"records"`
+}
+
 func sendBatchToZincSearch(batch []Email, zincSearchURL, zincSearchUser, zincSearchPassword string) error {
-	var buffer bytes.Buffer
-	for _, email := range batch {
-		buffer.WriteString(`{ "index" : { "_index" : "enron_emails" } }` + "\n")
-
-		emailJSON, err := json.Marshal(email)
-		if err != nil {
-			return err
-		}
-
-		buffer.Write(emailJSON)
-		buffer.WriteString("\n")
+	payload := BulkV2Payload{
+		Index:   "enron_emails",
+		Records: batch,
 	}
 
-	req, err := http.NewRequest(http.MethodPost, zincSearchURL, bytes.NewBuffer(buffer.Bytes()))
+	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set("Content-Type", "application/x-ndjson")
+	req, err := http.NewRequest(http.MethodPost, zincSearchURL, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(zincSearchUser, zincSearchPassword)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("error sending batch: %s", body)
+		return fmt.Errorf("error sending batch: %s", string(body))
 	}
 
 	return nil
@@ -66,7 +66,7 @@ func main() {
 		return
 	}
 
-	zincSearchURL := os.Getenv("ZINC_SEARCH_URL")
+	zincSearchAPI := os.Getenv("ZINC_SEARCH_BULKV2_API_ENDPOINT")
 	zincSearchUser := os.Getenv("ZINC_SEARCH_USER")
 	zincSearchPassword := os.Getenv("ZINC_SEARCH_PASSWORD")
 
@@ -83,7 +83,6 @@ func main() {
 	}
 
 	tarball := os.Args[1]
-
 	file, err := os.Open(tarball)
 	if err != nil {
 		panic(err)
@@ -112,7 +111,7 @@ func main() {
 			batch = append(batch, email)
 
 			if len(batch) >= defaultBatchSize {
-				err := sendBatchToZincSearch(batch, zincSearchURL, zincSearchUser, zincSearchPassword)
+				err := sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
 				if err != nil {
 					fmt.Printf("Error sending batch: %s\n", err)
 				}
@@ -123,7 +122,7 @@ func main() {
 
 	// Send any remaining emails in the last batch
 	if len(batch) > 0 {
-		err := sendBatchToZincSearch(batch, zincSearchURL, zincSearchUser, zincSearchPassword)
+		err := sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
 		if err != nil {
 			fmt.Printf("Error sending final batch: %s\n", err)
 		}
