@@ -94,30 +94,34 @@ func main() {
 
 	for {
 		header, err := tr.Next()
-		if err == io.EOF {
-			break
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			panic(err)
 		}
+
+		if header.Typeflag != tar.TypeReg {
+			continue
+		}
+
+		content, err := io.ReadAll(tr)
 		if err != nil {
 			panic(err)
 		}
 
-		if header.Typeflag == tar.TypeReg {
-			content, err := io.ReadAll(tr)
-			if err != nil {
-				panic(err)
-			}
+		email := Email{Content: string(content)}
+		batch = append(batch, email)
 
-			email := Email{Content: string(content)}
-			batch = append(batch, email)
-
-			if len(batch) >= defaultBatchSize {
-				err := sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
-				if err != nil {
-					fmt.Printf("Error sending batch: %s\n", err)
-				}
-				batch = nil // Reset the batch
-			}
+		if len(batch) < defaultBatchSize {
+			continue
 		}
+
+		err = sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
+		if err != nil {
+			fmt.Printf("Error sending batch: %s\n", err)
+		}
+		batch = nil // Reset the batch
 	}
 
 	// Send any remaining emails in the last batch
