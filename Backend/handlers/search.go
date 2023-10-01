@@ -11,7 +11,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type ZincSearchRequest struct {
+// SearchEngineRequest represents the structure of a search request for a generic search engine.
+type SearchEngineRequest struct {
 	SearchType string `json:"search_type"`
 	Query      struct {
 		Term  string `json:"term"`
@@ -21,19 +22,16 @@ type ZincSearchRequest struct {
 	MaxResults int `json:"max_results"`
 }
 
-func SearchEmails(w http.ResponseWriter, r *http.Request) {
-
-	// Load environment variables from .env file
-	err := godotenv.Load("../.env")
-	if err != nil {
+// SearchRecords handles search queries and returns search results.
+func SearchRecords(w http.ResponseWriter, r *http.Request) {
+	if err := godotenv.Load("../.env"); err != nil {
 		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
 		return
 	}
 
 	term := r.URL.Query().Get("term")
 
-	// Prepare the request for ZincSearch
-	zincReq := ZincSearchRequest{
+	searchReq := SearchEngineRequest{
 		SearchType: "match",
 		Query: struct {
 			Term  string `json:"term"`
@@ -46,26 +44,24 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 		MaxResults: 10,
 	}
 
-	jsonData, err := json.Marshal(zincReq)
+	jsonData, err := json.Marshal(searchReq)
 	if err != nil {
 		http.Error(w, "Error preparing search request", http.StatusInternalServerError)
 		return
 	}
 
-	// Fetch environment variables
-	zincSearchURL := os.Getenv("ZINC_SEARCH_URL")
-	zincSearchUser := os.Getenv("ZINC_SEARCH_USER")
-	zincSearchPassword := os.Getenv("ZINC_SEARCH_PASSWORD")
+	searchEngineURL := os.Getenv("SEARCH_ENGINE_URL")
+	searchEngineUser := os.Getenv("SEARCH_ENGINE_USER")
+	searchEnginePassword := os.Getenv("SEARCH_ENGINE_PASSWORD")
 
-	// Perform the call to ZincSearch
-	req, err := http.NewRequest(http.MethodPost, zincSearchURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, searchEngineURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		http.Error(w, "Error creating search request", http.StatusInternalServerError)
 		return
 	}
 
-	req.SetBasicAuth(zincSearchUser, zincSearchPassword)
 	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(searchEngineUser, searchEnginePassword)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -75,7 +71,6 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Read and return the response from ZincSearch
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, "Error reading search response", http.StatusInternalServerError)
@@ -86,5 +81,4 @@ func SearchEmails(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write(body); err != nil {
 		log.Printf("Could not write response: %v", err)
 	}
-
 }

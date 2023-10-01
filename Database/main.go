@@ -8,26 +8,29 @@ import (
 	"io"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
-const defaultBatchSize = 1000 // Default number of emails per batch
+// DefaultBatchSize is the number of records sent in each batch.
+const DefaultBatchSize = 1000
 
-type Email struct {
+// Record represents the structure of a record to be indexed.
+type Record struct {
 	Content string `json:"content"`
 }
 
-type BulkV2Payload struct {
-	Index   string  `json:"index"`
-	Records []Email `json:"records"`
+// BulkPayload is the payload structure for the search engine.
+type BulkPayload struct {
+	Index   string   `json:"index"`
+	Records []Record `json:"records"`
 }
 
-func sendBatchToZincSearch(batch []Email, zincSearchURL, zincSearchUser, zincSearchPassword string) error {
-	payload := BulkV2Payload{
-		Index:   "enron_emails",
+// sendBatchToSearchEngine sends a batch of records to the search engine.
+func sendBatchToSearchEngine(batch []Record, searchEngineURL, searchEngineUser, searchEnginePassword string) error {
+	payload := BulkPayload{
+		Index:   "generic_index",
 		Records: batch,
 	}
 
@@ -36,13 +39,13 @@ func sendBatchToZincSearch(batch []Email, zincSearchURL, zincSearchUser, zincSea
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, zincSearchURL, bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequest(http.MethodPost, searchEngineURL, bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(zincSearchUser, zincSearchPassword)
+	req.SetBasicAuth(searchEngineUser, searchEnginePassword)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -52,27 +55,25 @@ func sendBatchToZincSearch(batch []Email, zincSearchURL, zincSearchUser, zincSea
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("error sending batch: %s", string(body))
+		return fmt.Errorf("error sending batch: %s", body)
 	}
 
 	return nil
 }
 
 func main() {
-	// Load environment variables from .env file
-	err := godotenv.Load("../.env") //
-	if err != nil {
-		fmt.Println("Error loading .env file")
+	// Load environment variables.
+	if err := godotenv.Load("../.env"); err != nil {
+		fmt.Println("Error loading .env file.")
 		return
 	}
 
-	zincSearchAPI := os.Getenv("ZINC_SEARCH_BULKV2_API_ENDPOINT")
-	zincSearchUser := os.Getenv("ZINC_SEARCH_USER")
-	zincSearchPassword := os.Getenv("ZINC_SEARCH_PASSWORD")
+	searchEngineAPI := os.Getenv("SEARCH_ENGINE_BULK_API_ENDPOINT")
+	searchEngineUser := os.Getenv("SEARCH_ENGINE_USER")
+	searchEnginePassword := os.Getenv("SEARCH_ENGINE_PASSWORD")
 
 	go func() {
-		err := http.ListenAndServe(":6060", nil)
-		if err != nil {
+		if err := http.ListenAndServe(":6060", nil); err != nil {
 			log.Printf("Error starting profiling server: %v", err)
 		}
 	}()
@@ -82,22 +83,22 @@ func main() {
 		return
 	}
 
-	tarball := os.Args[1]
-	file, err := os.Open(tarball)
+	tarballPath := os.Args[1]
+	file, err := os.Open(tarballPath)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
 	tr := tar.NewReader(file)
-	var batch []Email
+	var batch []Record
 
 	for {
 		header, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
-			if err == io.EOF {
-				break
-			}
 			panic(err)
 		}
 
@@ -110,27 +111,22 @@ func main() {
 			panic(err)
 		}
 
-		email := Email{Content: string(content)}
-		batch = append(batch, email)
+		batch = append(batch, Record{Content: string(content)})
 
-		if len(batch) < defaultBatchSize {
-			continue
+		if len(batch) >= DefaultBatchSize {
+			if err := sendBatchToSearchEngine(batch, searchEngineAPI, searchEngineUser, searchEnginePassword); err != nil {
+				fmt.Printf("Error sending batch: %s\n", err)
+			}
+			batch = nil // Reset the batch
 		}
-
-		err = sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
-		if err != nil {
-			fmt.Printf("Error sending batch: %s\n", err)
-		}
-		batch = nil // Reset the batch
 	}
 
-	// Send any remaining emails in the last batch
+	// Send any remaining records.
 	if len(batch) > 0 {
-		err := sendBatchToZincSearch(batch, zincSearchAPI, zincSearchUser, zincSearchPassword)
-		if err != nil {
+		if err := sendBatchToSearchEngine(batch, searchEngineAPI, searchEngineUser, searchEnginePassword); err != nil {
 			fmt.Printf("Error sending final batch: %s\n", err)
 		}
 	}
 
-	fmt.Println("Finished indexing emails!")
+	fmt.Println("Finished indexing records!")
 }
