@@ -55,7 +55,7 @@ func main() {
 
 	// Define routes
 	r.Route("/api", func(r chi.Router) {
-		r.Get("/search", handlers.SearchEmails)
+		r.Get("/search", handlers.SearchRecords)
 	})
 
 	log.Printf("Starting the Go server on port %s...", goPort)
