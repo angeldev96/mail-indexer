@@ -22,8 +22,9 @@ type ZincSearchRequest struct {
 }
 
 func SearchEmails(w http.ResponseWriter, r *http.Request) {
+
 	// Load environment variables from .env file
-	err := godotenv.Load("../.env") // Adjust the path based on the relative location of your .env file
+	err := godotenv.Load("../.env")
 	if err != nil {
 		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
 		return
