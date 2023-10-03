@@ -25,8 +25,8 @@ We use the information obtained from the profiling in Part 2 to optimize the cod
 ## Technologies Used
 
 - Backend Language: Go
-- Database: ZincSearch
-- API Router: chi
+- Database/Search Engine: ZincSearch
+- API Router: go-chi
 - Interface: Vue 3
 - CSS: Tailwind
 
