@@ -2,6 +2,9 @@
 
 <template>
   <div>
+    <div  v-if="totalHits > 0" class="mb-4 text-white px-2">
+      Total emails found: {{ totalHits }}
+    </div>
     <!-- Tabla -->
     <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
       <!-- Encabezados de la tabla -->
@@ -49,8 +52,13 @@ export default {
     term: {
     type: String,
     default: ''
-  }
   },
+  totalHits: {  
+      type: Number,
+      default: 0
+    },
+  },
+  
   data() {
     return {
       selectedEmail: null
@@ -58,10 +66,12 @@ export default {
   },
   methods: {
     extractField(content, field) {
+      if (!content) return '';
       const regex = new RegExp(`${field}: (.+)\\r\\n`);
       const match = content.match(regex);
       return match ? match[1].trim() : '';
     },
+
     extractContentPreview(content) {
       const body = content.split('\r\n\r\n')[1];
       return body ? body.split(' ').slice(0, 5).join(' ') + '...' : '';

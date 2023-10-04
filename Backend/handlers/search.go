@@ -50,7 +50,7 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		From:       0,
-		MaxResults: 10,
+		MaxResults: 20,
 	}
 
 	jsonData, err := json.Marshal(searchReq)

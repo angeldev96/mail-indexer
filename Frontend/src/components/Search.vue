@@ -43,13 +43,14 @@ export default {
 
         const data = await response.json();
 
+
         const emailContents = data.hits.hits.map(hit => ({
           id: hit._id,
           content: hit._source.content,
           emails: this.extractEmails(hit._source.content)
         }));
 
-        this.$emit('searched', emailContents);
+        this.$emit('searched', { emailContents: emailContents, totalHits: data.hits.total.value });
       } catch (error) {
         console.error("Error fetching search results:", error);
         this.$emit('searched', []);

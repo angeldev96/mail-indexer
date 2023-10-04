@@ -1,9 +1,9 @@
 <template>
-  <div >
+  <div>
     <Search @updateTerm="term = $event" @searched="updateEmailContents" />
-    <EmailList :term="term" :emailContents="emailContents" />
+    <EmailList :term="term" :emailContents="emailContents" :totalHits="totalHits" />
 
-    </div>
+  </div>
 </template>
 
 <script>
@@ -18,13 +18,22 @@ export default {
   data() {
     return {
       emailContents: [],
-      term: ''
+      term: '',
+      totalHits: 0  
     };
   },
   methods: {
-    updateEmailContents(newEmailContents) {
-      this.emailContents = newEmailContents;
-    }
+    updateEmailContents({ emailContents, totalHits }) {
+    this.emailContents = emailContents;
+    this.totalHits = totalHits;
+  }
+  },
+
+  methods: {
+    updateEmailContents({ emailContents, totalHits }) {
+    this.emailContents = emailContents;
+    this.totalHits = totalHits;
+  }
   }
 };
 </script>
