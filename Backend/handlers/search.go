@@ -18,8 +18,9 @@ type SearchEngineRequest struct {
 		Term  string `json:"term"`
 		Field string `json:"field"`
 	} `json:"query"`
-	From       int `json:"from"`
-	MaxResults int `json:"max_results"`
+	Aggregations map[string]interface{} `json:"aggregations,omitempty"`
+	From         int                    `json:"from"`
+	MaxResults   int                    `json:"max_results"`
 }
 
 // SearchRecords handles search queries and returns search results.
@@ -39,6 +40,14 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 		}{
 			Term:  term,
 			Field: "_all",
+		},
+		Aggregations: map[string]interface{}{
+			"count_by_term": map[string]interface{}{
+				"terms": map[string]interface{}{
+					"field":   "_all",
+					"include": term,
+				},
+			},
 		},
 		From:       0,
 		MaxResults: 10,
