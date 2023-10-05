@@ -12,7 +12,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// SearchEngineRequest represents the structure of a search request for a generic search engine.
 type SearchEngineRequest struct {
 	SearchType string `json:"search_type"`
 	Query      struct {
@@ -24,15 +23,12 @@ type SearchEngineRequest struct {
 	MaxResults   int                    `json:"max_results"`
 }
 
-// SearchRecords handles search queries and returns search results.
-func SearchRecords(w http.ResponseWriter, r *http.Request) {
-	if err := godotenv.Load("../.env"); err != nil {
-		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
-		return
-	}
+func loadEnv() error {
+	return godotenv.Load("../.env")
+}
 
+func prepareSearchRequest(r *http.Request) (*SearchEngineRequest, error) {
 	term := r.URL.Query().Get("term")
-
 	pageStr := r.URL.Query().Get("page")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
@@ -42,7 +38,7 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 	const resultsPerPage = 10
 	from := (page - 1) * resultsPerPage
 
-	searchReq := SearchEngineRequest{
+	return &SearchEngineRequest{
 		SearchType: "match",
 		Query: struct {
 			Term  string `json:"term"`
@@ -59,14 +55,15 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		},
-		From:       from, // Paso 3: Usar el valor calculado de `From`
+		From:       from,
 		MaxResults: resultsPerPage,
-	}
+	}, nil
+}
 
+func executeSearchRequest(searchReq *SearchEngineRequest) (*http.Response, error) {
 	jsonData, err := json.Marshal(searchReq)
 	if err != nil {
-		http.Error(w, "Error preparing search request", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
 	searchEngineURL := os.Getenv("SEARCH_ENGINE_URL")
@@ -75,15 +72,29 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequest(http.MethodPost, searchEngineURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		http.Error(w, "Error creating search request", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(searchEngineUser, searchEnginePassword)
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	return client.Do(req)
+}
+
+func SearchRecords(w http.ResponseWriter, r *http.Request) {
+	if err := loadEnv(); err != nil {
+		http.Error(w, "Error loading .env file", http.StatusInternalServerError)
+		return
+	}
+
+	searchReq, err := prepareSearchRequest(r)
+	if err != nil {
+		http.Error(w, "Error preparing search request", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := executeSearchRequest(searchReq)
 	if err != nil {
 		http.Error(w, "Error executing search request", http.StatusInternalServerError)
 		return
