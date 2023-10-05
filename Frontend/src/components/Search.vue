@@ -36,7 +36,7 @@ export default {
       const encodedTerm = encodeURIComponent(this.term);
 
       try {
-        const response = await fetch(`http://localhost:8080/api/search?term=${encodedTerm}`);
+        const response = await fetch(`http://localhost:8080/api/search?term=${encodedTerm}&page=${this.currentPage}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -57,6 +57,18 @@ export default {
       }
     }
 
+  },
+  props: {
+    currentPage: {
+      type: Number,
+      default: 1
+    }
+  },
+  watch: {
+    currentPage() {
+      this.search();  
+    }
   }
+
 };
 </script>

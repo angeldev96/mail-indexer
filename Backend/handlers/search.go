@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -32,6 +33,15 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 
 	term := r.URL.Query().Get("term")
 
+	pageStr := r.URL.Query().Get("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	const resultsPerPage = 10
+	from := (page - 1) * resultsPerPage
+
 	searchReq := SearchEngineRequest{
 		SearchType: "match",
 		Query: struct {
@@ -49,8 +59,8 @@ func SearchRecords(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		},
-		From:       0,
-		MaxResults: 10,
+		From:       from, // Paso 3: Usar el valor calculado de `From`
+		MaxResults: resultsPerPage,
 	}
 
 	jsonData, err := json.Marshal(searchReq)

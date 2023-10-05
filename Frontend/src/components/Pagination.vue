@@ -57,13 +57,17 @@ export default {
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.$emit('pageChanged', this.currentPage);
       }
     },
+
     nextPage() {
       if (this.currentPage < Math.ceil(this.totalHits / this.entriesPerPage)) {
         this.currentPage++;
+        this.$emit('pageChanged', this.currentPage);
       }
     }
+
   }
 };
 </script>
