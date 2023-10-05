@@ -32,19 +32,17 @@
       <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
     </table>
   </div>
-  <Pagination :totalHits="totalHits" />
 
 </template>
 
 <script>
 import EmailDetail from './EmailDetail.vue';
-import Pagination from './Pagination.vue';
 
 export default {
 
   components: {
     EmailDetail,
-    Pagination
+    
   },
   props: {
     emailContents: {
