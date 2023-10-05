@@ -16,32 +16,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	// Load environment variables from .env file
-	err := godotenv.Load("../.env")
-	if err != nil {
+func loadEnvVariables() error {
+	return godotenv.Load("../.env")
+}
 
-		log.Fatal("Error loading .env file")
-	}
-
-	// Get environment variables
-	goPort := os.Getenv("GO_SERVER_PORT")
-	frontendPort := os.Getenv("FRONTEND_SERVER_PORT")
-	frontendDir := os.Getenv("FRONTEND_DIR")
-	allowedOrigins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")
-
-	// Define the flag for the server port
-	defaultFrontendPort, _ := strconv.Atoi(frontendPort)
-	portPtr := flag.Int("port", defaultFrontendPort, "Port on which the server will run")
-
-	flag.Parse()
-
-	// Start the frontend server on the specified port
-	go startFrontendServer(*portPtr, frontendDir)
-
-	r := chi.NewRouter()
-
-	// Configure CORS
+func configureCORS(allowedOrigins []string) func(next http.Handler) http.Handler {
 	corsConfig := cors.New(cors.Options{
 		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -50,20 +29,37 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           300,
 	})
+	return corsConfig.Handler
+}
 
-	r.Use(corsConfig.Handler)
-
-	// Define routes
+func startGoServer(port string) {
+	r := chi.NewRouter()
+	r.Use(configureCORS(strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",")))
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/search", handlers.SearchRecords)
 	})
 
-	log.Printf("Starting the Go server on port %s...", goPort)
-	listenErr := http.ListenAndServe(fmt.Sprintf(":%s", goPort), r)
-	if listenErr != nil {
-		log.Fatalf("Could not start the HTTP server: %v", listenErr)
+	log.Printf("Starting the Go server on port %s...", port)
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), r); err != nil {
+		log.Fatalf("Could not start the HTTP server: %v", err)
+	}
+}
+
+func main() {
+	if err := loadEnvVariables(); err != nil {
+		log.Fatal("Error loading .env file")
 	}
 
+	goPort := os.Getenv("GO_SERVER_PORT")
+	frontendPort := os.Getenv("FRONTEND_SERVER_PORT")
+	frontendDir := os.Getenv("FRONTEND_DIR")
+
+	defaultFrontendPort, _ := strconv.Atoi(frontendPort)
+	portPtr := flag.Int("port", defaultFrontendPort, "Port on which the server will run")
+	flag.Parse()
+
+	go startFrontendServer(*portPtr, frontendDir)
+	startGoServer(goPort)
 }
 
 func startFrontendServer(port int, frontendDir string) {
