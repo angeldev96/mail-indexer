@@ -2,9 +2,7 @@
 
 <template>
   <div>
-    <div  v-if="totalHits > 0" class="mb-4 text-white px-2">
-      Total emails found: {{ totalHits }}
-    </div>
+
     <!-- Tabla -->
     <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
       <!-- Encabezados de la tabla -->
@@ -34,15 +32,19 @@
       <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
     </table>
   </div>
+  <Pagination :totalHits="totalHits" />
+
 </template>
 
 <script>
 import EmailDetail from './EmailDetail.vue';
+import Pagination from './Pagination.vue';
 
 export default {
 
   components: {
-    EmailDetail
+    EmailDetail,
+    Pagination
   },
   props: {
     emailContents: {
