@@ -27,7 +27,14 @@ type BulkPayload struct {
 	Records []Record `json:"records"`
 }
 
-// sendBatchToSearchEngine sends a batch of records to the search engine.
+func loadEnvAndConfig() (string, string, string, error) {
+	if err := godotenv.Load("../.env"); err != nil {
+		return "", "", "", err
+	}
+
+	return os.Getenv("SEARCH_ENGINE_BULK_API_ENDPOINT"), os.Getenv("SEARCH_ENGINE_USER"), os.Getenv("SEARCH_ENGINE_PASSWORD"), nil
+}
+
 func sendBatchToSearchEngine(batch []Record, searchEngineURL, searchEngineUser, searchEnginePassword string) error {
 	payload := BulkPayload{
 		Index:   "generic_index",
@@ -61,72 +68,85 @@ func sendBatchToSearchEngine(batch []Record, searchEngineURL, searchEngineUser, 
 	return nil
 }
 
-func main() {
-	// Load environment variables.
-	if err := godotenv.Load("../.env"); err != nil {
-		fmt.Println("Error loading .env file.")
-		return
+func readRecordsFromTarball(tarballPath string) (<-chan Record, error) {
+	file, err := os.Open(tarballPath)
+	if err != nil {
+		return nil, err
 	}
 
-	searchEngineAPI := os.Getenv("SEARCH_ENGINE_BULK_API_ENDPOINT")
-	searchEngineUser := os.Getenv("SEARCH_ENGINE_USER")
-	searchEnginePassword := os.Getenv("SEARCH_ENGINE_PASSWORD")
-
+	out := make(chan Record)
 	go func() {
-		if err := http.ListenAndServe(":6060", nil); err != nil {
-			log.Printf("Error starting profiling server: %v", err)
+		defer close(out)
+		defer file.Close()
+
+		tr := tar.NewReader(file)
+		for {
+			header, err := tr.Next()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Printf("Error reading tarball: %v", err)
+				return
+			}
+
+			if header.Typeflag != tar.TypeReg {
+				continue
+			}
+
+			content, err := io.ReadAll(tr)
+			if err != nil {
+				log.Printf("Error reading file content from tarball: %v", err)
+				return
+			}
+
+			out <- Record{Content: string(content)}
 		}
 	}()
 
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: ./indexer <path_to_tarball>")
-		return
-	}
+	return out, nil
+}
 
-	tarballPath := os.Args[1]
-	file, err := os.Open(tarballPath)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	tr := tar.NewReader(file)
+func processRecordsAndSend(searchEngineAPI, searchEngineUser, searchEnginePassword string, records <-chan Record) {
 	var batch []Record
 
-	for {
-		header, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			panic(err)
-		}
-
-		if header.Typeflag != tar.TypeReg {
-			continue
-		}
-
-		content, err := io.ReadAll(tr)
-		if err != nil {
-			panic(err)
-		}
-
-		batch = append(batch, Record{Content: string(content)})
+	for record := range records {
+		batch = append(batch, record)
 
 		if len(batch) >= DefaultBatchSize {
 			if err := sendBatchToSearchEngine(batch, searchEngineAPI, searchEngineUser, searchEnginePassword); err != nil {
-				fmt.Printf("Error sending batch: %s\n", err)
+				log.Printf("Error sending batch: %s\n", err)
 			}
 			batch = nil // Reset the batch
 		}
 	}
 
-	// Send any remaining records.
 	if len(batch) > 0 {
 		if err := sendBatchToSearchEngine(batch, searchEngineAPI, searchEngineUser, searchEnginePassword); err != nil {
-			fmt.Printf("Error sending final batch: %s\n", err)
+			log.Printf("Error sending final batch: %s\n", err)
 		}
 	}
+}
 
-	fmt.Println("Finished indexing records!")
+func main() {
+	searchEngineAPI, searchEngineUser, searchEnginePassword, err := loadEnvAndConfig()
+	if err != nil {
+		log.Fatalf("Error during initialization: %v", err)
+		return
+	}
+
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: ./indexer <path_to_tarball>")
+		return
+	}
+
+	tarballPath := os.Args[1]
+	records, err := readRecordsFromTarball(tarballPath)
+	if err != nil {
+		log.Fatalf("Error reading records from tarball: %v", err)
+		return
+	}
+
+	processRecordsAndSend(searchEngineAPI, searchEngineUser, searchEnginePassword, records)
+	log.Println("Finished indexing records!")
 }
