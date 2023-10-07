@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bg-gray-900">
     <Search @updateTerm="term = $event" @searched="updateEmailContents" :currentPage="currentPage" />
     <EmailList :term="term" :emailContents="emailContents" :totalHits="totalHits" />
     <Pagination :totalHits="totalHits" @pageChanged="handlePageChange" />
@@ -37,9 +37,7 @@ export default {
     },
     handlePageChange(page) {
       this.currentPage = page;
-      // Aquí puedes hacer la solicitud de búsqueda nuevamente con la nueva página.
-      // Puedes emitir un evento desde aquí al componente `Search` para que realice la búsqueda
-      // o mover la lógica de búsqueda aquí.
+ 
    },
   }
 };

@@ -1,39 +1,43 @@
 
 
 <template>
-    <div >
+  <div>
 
-    <!-- Tabla -->
-    <table class="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-      <!-- Encabezados de la tabla -->
-      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <th class="px-6 py-3">Sent by</th>
-          <th class="px-6 py-3">Subject</th>
-          <th class="px-6 py-3">Preview</th>
-          <th class="px-6 py-3">Date</th>
-        </tr>
-      </thead>
-      <tbody >
-        <!-- Lista de correos -->
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-sky-900 rounded-xl cursor-pointer" v-for="emailContent in emailContents" :key="emailContent._id" @click="selectEmail(emailContent)">
-          <td class="px-6 py-4 border font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            {{ extractField(emailContent.content, 'From') }}
-          </td>
-          <td class="px-6 py-4 border" v-html="highlightKeyword(extractField(emailContent.content, 'Subject'), term)">
-          </td>
-          <td class="px-6 py-4 border" v-html="highlightKeyword(extractContentPreview(emailContent.content), term)">
-          </td>
-          <td class="px-6 py-4 border">
-            {{ formatDate(extractField(emailContent.content, 'Date')) }}
-          </td>
-        </tr>
-      </tbody>
-      <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
-    </table>
+    <div 
+      class="flex flex-col break-words border border-solid border-slate-100/[0.05] bg-gray-900 py-4 font-light text-gray-500 cursor-pointer"
+      v-for="emailContent in emailContents"
+      :key="emailContent._id"
+      @click="selectEmail(emailContent)"
+    >
+      <div class="flex flex-grow items-center px-6">
+        <div class="flex basis-[8.33333%] items-center">
+          <div class="mr-2"><label class="inline-block pl-6"></label></div>
+          <div><label class="inline-block cursor-pointer text-slate-200"></label></div>
+        </div>
+        <div class="basis-[16.6667%] pr-3.5">
+          <a href="#" class="flex cursor-pointer items-center text-slate-100">
+            <div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-red-500 font-semibold text-white">
+              <span>SA</span>
+            </div>
+            <span class="text-gray-200">{{ extractField(emailContent.content, 'From') }}</span>
+          </a>
+        </div>
+        <div class="order-4 flex basis-[16.6667%] items-center justify-end">
+          <div class="text-[0.80rem] text-gray-200">{{ formatDate(extractField(emailContent.content, 'Date')) }}</div>
+          <div class="ml-4 flex align-middle"><button class="flex-grow cursor-pointer items-start rounded-lg border border-solid text-slate-900"></button></div>
+        </div>
+        <div class="flex basis-7/12 items-center pr-3.5">
+          <a href="#" class="cursor-pointer overflow-hidden text-ellipsis">
+            <span v-html="highlightKeyword(extractContentPreview(emailContent.content), term)"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <EmailDetail v-if="selectedEmail" :email="selectedEmail" :term="term" />
   </div>
-
 </template>
+
 
 <script>
 import EmailDetail from './EmailDetail.vue';
