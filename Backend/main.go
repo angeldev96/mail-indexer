@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -63,11 +64,24 @@ func main() {
 }
 
 func startFrontendServer(port int, frontendDir string) {
-	cmd := exec.Command("npm", "run", "dev", "--", fmt.Sprintf("--port=%d", port))
-	cmd.Dir = frontendDir
-	err := cmd.Start()
-	if err != nil {
-		log.Fatalf("Error starting the frontend server: %v", err)
+	distDir := filepath.Join(frontendDir, "dist")
+
+	if _, err := os.Stat(distDir); os.IsNotExist(err) {
+		// If the dist directory does not exist, build the project
+		buildCmd := exec.Command("npm", "run", "build")
+		buildCmd.Dir = frontendDir
+		err := buildCmd.Run()
+		if err != nil {
+			log.Fatalf("Error building the frontend project: %v", err)
+		}
 	}
-	log.Printf("Frontend server started on port %d...", port)
+
+	// Start the preview server
+	previewCmd := exec.Command("npm", "run", "preview", "--", "--port", strconv.Itoa(port))
+	previewCmd.Dir = frontendDir
+	err := previewCmd.Start()
+	if err != nil {
+		log.Fatalf("Error starting the preview server: %v", err)
+	}
+	log.Printf("Preview server started on port %d...", port)
 }
