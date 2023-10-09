@@ -77,7 +77,7 @@ func startFrontendServer(port int, frontendDir string) {
 	}
 
 	// Start the preview server
-	previewCmd := exec.Command("npm", "run", "preview", "--", "--port", strconv.Itoa(port))
+	previewCmd := exec.Command("npm", "run", "dev", "--", "--port", strconv.Itoa(port))
 	previewCmd.Dir = frontendDir
 	err := previewCmd.Start()
 	if err != nil {

@@ -11,8 +11,8 @@
     >
       <div class="flex flex-grow items-center px-6">
         <div class="flex basis-[8.33333%] items-center">
-          <div class="mr-2"><label class="inline-block pl-6"></label></div>
-          <div><label class="inline-block cursor-pointer text-slate-200"></label></div>
+          <div class="mr-2"></div>
+          <div class="inline-block cursor-pointer text-slate-200"></div>
         </div>
         <div class="basis-[16.6667%] pr-3.5">
           <a href="#" class="flex cursor-pointer items-center text-slate-100">

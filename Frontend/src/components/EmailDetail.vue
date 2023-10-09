@@ -76,7 +76,11 @@
       email: {
         type: Object,
         required: true
-      }
+      },
+      term: {
+      type: String,
+      default: ''
+    }
     },
     methods: {
       extractField(content, field) {
