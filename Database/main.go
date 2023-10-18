@@ -32,7 +32,7 @@ func loadEnvAndConfig() (string, string, string, error) {
 		return "", "", "", err
 	}
 
-	return os.Getenv("SEARCH_ENGINE_BULK_API_ENDPOINT"), os.Getenv("SEARCH_ENGINE_USER"), os.Getenv("SEARCH_ENGINE_PASSWORD"), nil
+	return os.Getenv("SEARCH_ENGINE_BULKV2_API_ENDPOINT"), os.Getenv("SEARCH_ENGINE_USER"), os.Getenv("SEARCH_ENGINE_PASSWORD"), nil
 }
 
 func sendBatchToSearchEngine(batch []Record, searchEngineURL, searchEngineUser, searchEnginePassword string) error {
